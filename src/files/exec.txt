@@ -1,0 +1,6 @@
+exec p1 rr
+exec p2 pr=1
+exec p3 rr
+exec p4 pr=2
+exec p5 rr
+exec p6 rr
