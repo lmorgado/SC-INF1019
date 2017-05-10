@@ -1,6 +1,5 @@
-exec p1 rr
-exec p2 pr=1
-exec p3 rr
-exec p4 pr=2
-exec p5 rr
-exec p6 rr
+exec p5 I=1.00D=0.50
+exec p1 RR
+exec p2 PR=6
+exec p4 PR=3
+exec p3 I=2.00D=0.20
