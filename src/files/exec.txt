@@ -1,5 +1,3 @@
-exec p5 I=1.00D=0.50
-exec p1 RR
-exec p2 PR=6
-exec p4 PR=3
-exec p3 I=2.00D=0.20
+exec p1 PR=7
+exec p2 PR=1
+exec p3 PR=2

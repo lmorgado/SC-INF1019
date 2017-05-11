@@ -58,9 +58,9 @@ bool isProcessFinish(void);
 Process *newProcess();
 void insertNodeToQueue(PriorityQueue *pqueue, char *path, char *policie);
 void removeNodeFromQueue(Lista *queue, int id);
-void priorities(void);
-void roundrobin(void);
-void realtime(void);
+void priorities(Process *P);
+void roundrobin(Process *P);
+void realtime(Process *P);
 void onalarm(void);
 
 
@@ -108,16 +108,22 @@ int main(void) {
 									
 	while(1) {
 
-		if(*isnewdata == 1) {		
+		if(*isnewdata) {		
 			
 			*isnewdata = 0;
 			insertNodeToQueue(READYQueue, pathstr, policiestr);
-		
-		} else if (*isend == 1 && EmptyPriorityQueue(READYQueue)) { break; }
-	
-		priorities();
-		roundrobin();
-		realtime();	
+					
+		} else if (*isend) {
+			
+			while(!EmptyPriorityQueue(READYQueue)) {
+				
+				priorities((Process*)READYQueue->prox->info);
+				roundrobin((Process*)READYQueue->prox->info);
+				realtime((Process*)READYQueue->prox->info);			
+			}
+					
+			break; 
+		}	
 	}
 		
 	shmdt(pathstr);
@@ -129,22 +135,19 @@ int main(void) {
 	shmctl(policieSeg, IPC_RMID, 0);
 	shmctl(isEndSeg, IPC_RMID, 0);
 
-	return 0;
-	
+	return 0;	
 }
 
-void priorities() {
+
+void priorities(Process *P) {
 		
-	if (execv(P->path, NULL) < 0)
-		exit(1);	
+	
+	
 
-	removeNodeFromQueue(READYQueue, P->id);
 }
 
 
-
-
-void roundrobin() {
+void roundrobin(Process *P) {
 
 	
 
@@ -152,7 +155,8 @@ void roundrobin() {
 		
 }
 
-void realtime() {
+
+void realtime(Process *P) {
 	
 	
 	
@@ -210,7 +214,7 @@ void insertNodeToQueue(PriorityQueue *pqueue, char *path, char *policie) {
 		process->deltaD = atof(substr);							
 	}
 	
-	Priority_enQueue(queue, process, priority);
+	Priority_enQueue(pqueue, process, priority);
 }
 
 void removeNodeFromQueue(Lista *queue, int id) {
