@@ -39,7 +39,7 @@ typedef enum policie {
 
 typedef struct proc {	
 	int id;
-	const char *path;	
+	char *path;	
 	int bound;
 	double time_created;
 	double instantI;
@@ -78,7 +78,10 @@ int main(void) {
 	 
 	 beginning = getTimeElapsed(0.00000);
 	 now = getTimeElapsed(beginning);
-		
+	 
+ 	READYQueue = initPriorityQueue();
+ 	IOQueue = initQueue();
+										
 	if ((isnewdataSeg = shmget(ISNEWDATA, sizeof(int), IPC_CREAT | S_IRUSR | S_IWUSR)) == -1) { 		
 		perror("NEWINFO");
 		exit(1);
@@ -102,30 +105,24 @@ int main(void) {
 		exit(1);
 	}		
 	pathstr = (char*)shmat(pathSeg, 0, 0);
-	
-	READYQueue = initPriorityQueue();
-	IOQueue = initQueue();
-									
+		
 	while(1) {
 
 		if(*isnewdata) {		
 			
 			*isnewdata = 0;
 			insertNodeToQueue(READYQueue, pathstr, policiestr);
-					
-		} else if (*isend) {
+
+		} else if (*isend) { 
 			
-			while(!EmptyPriorityQueue(READYQueue)) {
+			while (!EmptyPriorityQueue(READYQueue))
 				
 				priorities((Process*)READYQueue->prox->info);
-				roundrobin((Process*)READYQueue->prox->info);
-				realtime((Process*)READYQueue->prox->info);			
-			}
-					
-			break; 
+							
+			break; 		
 		}	
 	}
-		
+
 	shmdt(pathstr);
 	shmdt(policiestr);
 	shmdt(isnewdata);
@@ -141,9 +138,12 @@ int main(void) {
 
 void priorities(Process *P) {
 		
-	
-	
-
+	if (fork() == 0) {
+		execv(P->path, NULL);		
+	}
+			
+	wait(NULL);
+	removeNodeFromQueue(READYQueue, P->id);
 }
 
 
@@ -213,8 +213,8 @@ void insertNodeToQueue(PriorityQueue *pqueue, char *path, char *policie) {
 		substr = strstr(policie, "D=") + 2;
 		process->deltaD = atof(substr);							
 	}
-	
-	Priority_enQueue(pqueue, process, priority);
+		
+	Priority_enQueue(pqueue, process, priority);	
 }
 
 void removeNodeFromQueue(Lista *queue, int id) {

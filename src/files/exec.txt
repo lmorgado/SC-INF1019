@@ -1,3 +1,4 @@
 exec p1 PR=7
 exec p2 PR=1
-exec p3 PR=2
+exec p3 PR=5
+exec p4 PR=4
